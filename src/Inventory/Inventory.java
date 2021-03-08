@@ -1,6 +1,8 @@
 package Inventory;
 import Users.user_login;
-import java.sql.*;
+import java.awt.Color;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -21,11 +23,10 @@ public class Inventory extends javax.swing.JFrame {
         initComponents();
         model = (DefaultTableModel) stock.getModel();
         displayAllProducts();
-        sendNotifications();
     }
     
     protected static void displayAllProducts(){
-        printResultSet(employee.listAllProducts());
+        printResultSet(InventoryEmployee.listAllProducts());
     }
     
     protected static void printResultSet(ResultSet r){
@@ -47,22 +48,6 @@ public class Inventory extends javax.swing.JFrame {
         }
     }
     
-    public static void sendNotifications(){
-        try {
-            Object[] result = new Object[2];
-            result = employee.getNotifications('q');
-            if((int)result[0]>0)
-                JOptionPane.showMessageDialog(null,""+result[1].toString()+"\nabout to be out of the stock",
-                        "Warning", JOptionPane.WARNING_MESSAGE);
-            result = null;
-            result = employee.getNotifications('e');
-            if((int)result[0]>0)
-                JOptionPane.showMessageDialog(null,""+result[1].toString()+"\nabout to be expire",
-                        "Warning", JOptionPane.WARNING_MESSAGE);
-        } catch (SQLException ex) {
-            Logger.getLogger(Inventory.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -82,6 +67,7 @@ public class Inventory extends javax.swing.JFrame {
         s = new javax.swing.JLabel();
         input = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
+        notification = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Inventory Managment");
@@ -219,29 +205,18 @@ public class Inventory extends javax.swing.JFrame {
         s.setForeground(new java.awt.Color(255, 255, 255));
         s.setText("Search");
 
-        input.addContainerListener(new java.awt.event.ContainerAdapter() {
-            public void componentAdded(java.awt.event.ContainerEvent evt) {
-                inputComponentAdded(evt);
-            }
-            public void componentRemoved(java.awt.event.ContainerEvent evt) {
-                inputComponentRemoved(evt);
-            }
-        });
-        input.addInputMethodListener(new java.awt.event.InputMethodListener() {
-            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
-            }
-            public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
-                inputInputMethodTextChanged(evt);
-            }
-        });
-        input.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                inputActionPerformed(evt);
-            }
-        });
         input.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 inputKeyReleased(evt);
+            }
+        });
+
+        notification.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        notification.setForeground(new java.awt.Color(255, 51, 51));
+        notification.setText(" Notifications");
+        notification.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                notificationMouseClicked(evt);
             }
         });
 
@@ -255,12 +230,15 @@ public class Inventory extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(updateL, javax.swing.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
-                    .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(profileL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(addL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(deleteL)))
-                .addGap(10, 10, 10)
+                    .addGroup(mainPanelLayout.createSequentialGroup()
+                        .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(profileL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(addL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(deleteL)
+                            .addComponent(notification, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(0, 23, Short.MAX_VALUE))
+                    .addComponent(updateL, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(mainPanelLayout.createSequentialGroup()
                         .addComponent(s)
@@ -276,10 +254,6 @@ public class Inventory extends javax.swing.JFrame {
                 .addGap(6, 6, 6)
                 .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(mainPanelLayout.createSequentialGroup()
-                        .addGap(194, 194, 194)
-                        .addComponent(jLabel1)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(mainPanelLayout.createSequentialGroup()
                         .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(s)
                             .addComponent(input, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -287,13 +261,19 @@ public class Inventory extends javax.swing.JFrame {
                         .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(mainPanelLayout.createSequentialGroup()
+                                .addComponent(notification, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
                                 .addComponent(profileL, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(addL, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(updateL, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(deleteL, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(deleteL, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(mainPanelLayout.createSequentialGroup()
+                        .addGap(194, 194, 194)
+                        .addComponent(jLabel1)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -311,10 +291,6 @@ public class Inventory extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-
-    private void inputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inputActionPerformed
-        
-    }//GEN-LAST:event_inputActionPerformed
 
     private void inputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_inputKeyReleased
        String keyWord = input.getText();
@@ -341,18 +317,6 @@ public class Inventory extends javax.swing.JFrame {
         updateProduct.setDataToTextFields(data); 
         updateProduct.setID(Integer.parseInt(id));
     }//GEN-LAST:event_stockMouseClicked
-
-    private void inputInputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_inputInputMethodTextChanged
-        
-    }//GEN-LAST:event_inputInputMethodTextChanged
-
-    private void inputComponentAdded(java.awt.event.ContainerEvent evt) {//GEN-FIRST:event_inputComponentAdded
-        
-    }//GEN-LAST:event_inputComponentAdded
-
-    private void inputComponentRemoved(java.awt.event.ContainerEvent evt) {//GEN-FIRST:event_inputComponentRemoved
-        
-    }//GEN-LAST:event_inputComponentRemoved
 
     private void close1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_close1MouseClicked
         int r=JOptionPane.showConfirmDialog(null, "Are you sure you want to sign out?", "Sign out",JOptionPane.YES_NO_OPTION);
@@ -414,6 +378,11 @@ public class Inventory extends javax.swing.JFrame {
         updateProfile.setVisible(true);
     }//GEN-LAST:event_profileLMouseClicked
 
+    private void notificationMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_notificationMouseClicked
+        new NotificationCenter().setVisible(true); 
+        notification.setForeground(Color.WHITE);
+    }//GEN-LAST:event_notificationMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -460,6 +429,7 @@ public class Inventory extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPanel mainPanel;
+    private javax.swing.JLabel notification;
     private javax.swing.JLabel profileL;
     private javax.swing.JLabel s;
     private javax.swing.JTable stock;

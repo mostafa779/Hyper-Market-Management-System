@@ -4,7 +4,7 @@ import Users.User;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.chrono.ChronoLocalDate;
-import java.util.Vector;
+import java.util.ArrayList;
 
 public class InventoryEmployee extends User{
     
@@ -44,13 +44,19 @@ public class InventoryEmployee extends User{
     }
     
     protected ResultSet search(String keyWord){
-        String sql = "select * from stock where name like '"+keyWord+"%'or category like'"+keyWord+"%'";
+        String sql;
+        try{
+            int id = Integer.parseInt(keyWord);
+            sql = "select * from stock where id='"+id+"'";
+        }catch(NumberFormatException e){
+            sql = "select * from stock where name like '"+keyWord+"%'or category like'"+keyWord+"%'";
+        }
         ResultSet r = DB.executeQuery(sql);
         return r;
     }
     
-    private static Vector getName() throws SQLException{
-        Vector name = new Vector();
+    private static ArrayList getName() throws SQLException{
+        ArrayList name = new ArrayList();
         String sql = "select * from stock";
         ResultSet r = DB.executeQuery(sql);
         while(r.next())
@@ -58,8 +64,8 @@ public class InventoryEmployee extends User{
         return name;
     }
     
-    private static Vector getShortage() throws SQLException{
-        Vector shortage = new Vector();
+    private static ArrayList getShortage() throws SQLException{
+        ArrayList shortage = new ArrayList();
         String sql = "select shortage from stock";
         ResultSet r = DB.executeQuery(sql);
         while(r.next())
@@ -67,8 +73,8 @@ public class InventoryEmployee extends User{
         return shortage;
     }
     
-    private static Vector getQuantity() throws SQLException{
-        Vector quantity = new Vector();
+    private static ArrayList getQuantity() throws SQLException{
+        ArrayList quantity = new ArrayList();
         String sql = "select quantity from stock";
         ResultSet r = DB.executeQuery(sql);
         while(r.next())
@@ -76,8 +82,8 @@ public class InventoryEmployee extends User{
         return quantity;
     }
     
-    private static Vector getExpiry() throws SQLException{
-        Vector expiry = new Vector();
+    private static ArrayList getExpiry() throws SQLException{
+        ArrayList expiry = new ArrayList();
         String sql = "select expiry_date from stock";
         ResultSet r = DB.executeQuery(sql);
         while(r.next())
@@ -87,7 +93,7 @@ public class InventoryEmployee extends User{
     
     protected Object[] getNotifications(char x) throws SQLException{
         Object[] arr = new Object[2];
-        Vector temp = new Vector();
+        ArrayList temp = new ArrayList();
         int c = 0;
         if(x=='q')//loop for quantity
         {
