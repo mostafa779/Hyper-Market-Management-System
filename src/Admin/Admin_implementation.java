@@ -58,9 +58,8 @@ public class Admin_implementation extends User {
         try {
             DefaultTableModel DTM=dft;
             int id=Integer.parseInt(DTM.getValueAt(s_row,0).toString());
-            ResultSet rs = dc.executeQuery("select count(1) from employees where username='"+username+"'");
-            while(rs.next())
-                if(rs.getInt("count(1)")==0)
+            ResultSet rs = dc.executeQuery("select id from employees where username='"+username+"'");
+                if(!rs.next() || rs.getInt("id")==id)
                 {
                     dc.excuteUpdate("update employees set username='"+username+"',password='"+password+"',type='"+tof+"' where id='"+id+"'");
                     JOptionPane.showMessageDialog(null,"Employee has been updated");
@@ -70,7 +69,7 @@ public class Admin_implementation extends User {
                 {
                     JOptionPane.showMessageDialog(null,"Username ("+username+") already exists","ERROR",JOptionPane.ERROR_MESSAGE);
                 }
-        } catch (SQLException ex) {        }
+        } catch (SQLException ex) {   System.out.println(ex.getMessage());     }
     }
     
     void delete(DefaultTableModel dft,int s_row)
@@ -104,33 +103,47 @@ public class Admin_implementation extends User {
                 arr[2]=rs.getString("type");
             }
 
-        }   catch (SQLException ex) {        }
+        }   catch (SQLException ex) {  System.out.println(ex.getMessage());      }
                 return arr;
     }
     
     void update_Admin_Username()
     {
-        String N_username=((String)(JOptionPane.showInputDialog(null, "Enter a New Admin Username","",JOptionPane.OK_OPTION)));
+        String N_username=((String)(JOptionPane.showInputDialog(null, "Enter a New Admin Username","",JOptionPane.OK_CANCEL_OPTION)));
         try{
+            if(N_username == null)//cancel option
+            {}
+            else if("".equals(N_username))
+            {
+                JOptionPane.showMessageDialog(null,"Invalid input Please Enter a Valid Username","Null Username",JOptionPane.ERROR_MESSAGE);
+            }
+            else{
             int r = dc.excuteUpdate("Update employees set username='"+N_username+"'where type='Admin'");
             if(r==1)
-                JOptionPane.showMessageDialog(null,"Admin Password has been Update Successfully");
+                JOptionPane.showMessageDialog(null,"Admin Username has been Update Successfully");
+        }
         }catch(Exception e){
-        JOptionPane.showMessageDialog(null,"Invalid input","",JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(null,"Database Connection Error","Connection Error",JOptionPane.ERROR_MESSAGE);
         }
     }
     
     void update_Admin_Password()
     {
-        String N_password=((String)(JOptionPane.showInputDialog(null, "Enter a New Admin Password","",JOptionPane.OK_OPTION)));       
+        String N_password=((String)(JOptionPane.showInputDialog(null, "Enter a New Admin Password","",JOptionPane.OK_CANCEL_OPTION)));       
         try{
-            if(N_password != ""){
+            if(N_password == null)//cancel option
+            {}
+            else if("".equals(N_password))
+            {
+                JOptionPane.showMessageDialog(null,"Invalid input Please Enter a Valid Password","Null Password",JOptionPane.ERROR_MESSAGE);
+            }
+            else{//(N_password.length()>0)
             int r = dc.excuteUpdate("Update employees set password='"+N_password+"' where type='Admin'");
             if(r==1)
                 JOptionPane.showMessageDialog(null,"Admin Password has been Update Successfully");
             }
-        }catch(Exception e){
-        JOptionPane.showMessageDialog(null,"Invalid input","",JOptionPane.ERROR_MESSAGE);
+          }catch(Exception e){
+        JOptionPane.showMessageDialog(null,"Database Connection Error","Connection Error",JOptionPane.ERROR_MESSAGE);
         }
     }
 }
