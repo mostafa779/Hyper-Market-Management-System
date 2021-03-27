@@ -6,7 +6,7 @@ import javax.swing.ImageIcon;
 public class user_login extends javax.swing.JFrame {
 
     int x,y;
-    login_register_implemintation login=new login_register_implemintation();
+    Login login=new Login();
     
     public user_login() {
         initComponents();

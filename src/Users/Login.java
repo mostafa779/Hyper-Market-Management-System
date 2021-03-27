@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
 
-public class login_register_implemintation {
+public class Login {
     
         DatabaseConnection dc=new DatabaseConnection("com.mysql.cj.jdbc.Driver",  "jdbc:mysql://localhost:3306/market",
                 "root", "root");
@@ -70,7 +70,7 @@ public class login_register_implemintation {
                     else 
                         JOptionPane.showMessageDialog(null,"Invalid username or password", "Error",JOptionPane.ERROR_MESSAGE);
                 }catch (SQLException ex) {
-                    Logger.getLogger(login_register_implemintation.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 return false;
     }
