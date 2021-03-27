@@ -82,25 +82,6 @@ public class Marketing {
         }
         return 0;
     }
-    
-    public void setUpOffers() throws SQLException
-    {
-        LocalDate d;
-        try {
-        rs=dc.executeQuery("select id,offerEndDate from stock");
-        while(rs.next())
-        {
-            if(rs.getDate("offerEndDate")!=null)
-            {
-                d=LocalDate.parse(rs.getString("offerEndDate"));
-                if(OfferEnded(d))
-                    dc.excuteUpdate("update stock set offer= '"+0.0+"',offerEndDate='"+null+"'where '"+rs.getInt("id")+"'='"+rs.getInt("id")+"'");
-            }
-        }        
-        }catch (SQLException ex) {
-                System.out.println(ex.getMessage());
-            }
-        }
 
     public boolean OfferEnded(LocalDate endDate)
     {
